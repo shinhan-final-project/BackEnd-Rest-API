@@ -6,9 +6,11 @@ import com.shinhan.friends_stock.DTO.term_quiz.AnswerCheckResponseDTO;
 import com.shinhan.friends_stock.DTO.term_quiz.SolutionResponseDTO;
 import com.shinhan.friends_stock.common.ApiResponse;
 import com.shinhan.friends_stock.domain.TermQuizInfo;
+import com.shinhan.friends_stock.domain.entity.TermQuizItem;
 import com.shinhan.friends_stock.domain.entity.TermQuizQuestion;
 import com.shinhan.friends_stock.exception.ResourceNotFoundException;
 import com.shinhan.friends_stock.exception.ResourceNotPublishedException;
+import com.shinhan.friends_stock.repository.term_quiz.TermQuizItemRepository;
 import com.shinhan.friends_stock.repository.term_quiz.TermQuizQuestionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class TermQuizService {
     private static final int GAME_ID = 1;
 
     private final TermQuizQuestionRepository termQuizQuestionRepository;
+    private final TermQuizItemRepository termQuizItemRepository;
 
     private final LogService logService;
 
@@ -43,6 +46,7 @@ public class TermQuizService {
         }
     }
 
+    @Transactional
     public ApiResponse<AnswerCheckResponseDTO> checkAnswer(long quizId, UserAnswerRequsetDTO dto) throws Exception {
         try {
             // get from redis
@@ -66,6 +70,14 @@ public class TermQuizService {
             int point = isCorrect ? quiz.getPlusPoint() : quiz.getMinusPoint() * -1;
             result.setCorrect(isCorrect);
             result.setPoint(point);
+
+            // log
+            try {
+                TermQuizItem item = termQuizItemRepository.findById(dto.getUserAnswerId()).orElseThrow();
+                logService.saveLog(gameInfo.getGameId(), quiz, item, isCorrect);
+            } catch (Exception e) {
+                // Failed to save log
+            }
 
             // set to redis
             gameInfo.setPoint(gameInfo.getPoint() + point);

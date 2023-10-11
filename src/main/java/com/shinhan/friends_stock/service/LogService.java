@@ -3,13 +3,12 @@ package com.shinhan.friends_stock.service;
 import com.shinhan.friends_stock.domain.GameInfo;
 import com.shinhan.friends_stock.domain.TermQuizInfo;
 import com.shinhan.friends_stock.domain.UserInfo;
-import com.shinhan.friends_stock.domain.entity.Game;
-import com.shinhan.friends_stock.domain.entity.Member;
-import com.shinhan.friends_stock.domain.entity.RewardHistory;
+import com.shinhan.friends_stock.domain.entity.*;
 import com.shinhan.friends_stock.exception.ResourceNotFoundException;
 import com.shinhan.friends_stock.repository.GameRepository;
 import com.shinhan.friends_stock.repository.MemberRepository;
 import com.shinhan.friends_stock.repository.RewardHistoryRepository;
+import com.shinhan.friends_stock.repository.term_quiz.TermQuizLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
@@ -23,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LogService {
 
+    private final TermQuizLogRepository termQuizLogRepository;
     private final RewardHistoryRepository rewardHistoryRepository;
     private final MemberRepository memberRepository;
     private final GameRepository gameRepository;
@@ -106,6 +106,26 @@ public class LogService {
         if (history == null || history.size() == 0) return false;
 
         return true;
+    }
+
+    public void saveLog(long gameId, TermQuizQuestion quizQuestion, TermQuizItem item, boolean isCorrect) {
+        long userId = getUserId();
+
+        Member member = memberRepository.findById(userId).orElseThrow(
+                () -> new ResourceNotFoundException("Member not found")
+        );
+        Game game = gameRepository.findById(gameId).orElseThrow(
+                () -> new ResourceNotFoundException("Game not found")
+        );
+
+        TermQuizLog log = new TermQuizLog(
+                member,
+                game,
+                quizQuestion,
+                item,
+                isCorrect
+        );
+        termQuizLogRepository.save(log);
     }
 
     public void saveRewardHistory(long gameId, String reward) {
