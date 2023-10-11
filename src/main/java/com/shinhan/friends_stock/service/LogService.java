@@ -3,6 +3,13 @@ package com.shinhan.friends_stock.service;
 import com.shinhan.friends_stock.domain.GameInfo;
 import com.shinhan.friends_stock.domain.TermQuizInfo;
 import com.shinhan.friends_stock.domain.UserInfo;
+import com.shinhan.friends_stock.domain.entity.Game;
+import com.shinhan.friends_stock.domain.entity.Member;
+import com.shinhan.friends_stock.domain.entity.RewardHistory;
+import com.shinhan.friends_stock.exception.ResourceNotFoundException;
+import com.shinhan.friends_stock.repository.GameRepository;
+import com.shinhan.friends_stock.repository.MemberRepository;
+import com.shinhan.friends_stock.repository.RewardHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
@@ -10,9 +17,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class LogService {
+
+    private final RewardHistoryRepository rewardHistoryRepository;
+    private final MemberRepository memberRepository;
+    private final GameRepository gameRepository;
 
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -80,5 +93,40 @@ public class LogService {
      */
     private String generateKey(long userId, long gameId) {
         return "user:" + userId + ":game:" + gameId + ":info";
+    }
+
+    public boolean isDuplicatedReward(long userId, long gameId) {
+
+        List<RewardHistory> history = rewardHistoryRepository.findByMemberId(userId).orElse(null);
+        if (history == null || history.size() == 0) return false;
+
+        history = history.stream()
+                .filter(h -> h.getGame().getId() == gameId)
+                .toList();
+        if (history == null || history.size() == 0) return false;
+
+        return true;
+    }
+
+    public void saveRewardHistory(long gameId, String reward) {
+        long userId = getUserId();
+        if (isDuplicatedReward(userId, gameId)) return;
+
+        Member member = memberRepository.findById(userId).orElseThrow(
+                () -> new ResourceNotFoundException("Member not found")
+        );
+        Game game = gameRepository.findById(gameId).orElseThrow(
+                () -> new ResourceNotFoundException("Game not found")
+        );
+
+        RewardHistory.RewardHistoryBuilder builder = RewardHistory.builder()
+                .member(member)
+                .game(game);
+        if (reward != null && reward.length() > 0) {
+            builder.reward(reward);
+        }
+        RewardHistory history = builder.build();
+
+        rewardHistoryRepository.save(history);
     }
 }

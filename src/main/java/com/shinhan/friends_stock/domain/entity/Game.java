@@ -7,6 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "game")
@@ -44,4 +45,12 @@ public class Game {
     @NotNull
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @OneToMany(
+            mappedBy = "game",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<RewardHistory> rewardHistoryList;
 }

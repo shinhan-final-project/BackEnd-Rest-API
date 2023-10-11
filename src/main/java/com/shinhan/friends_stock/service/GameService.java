@@ -32,6 +32,7 @@ public class GameService {
         }
     }
 
+    @Transactional
     public ApiResponse<GameOverResponseDTO> calcGameResult(long gameId) {
         // get from redis
         GameInfo gameInfo = logService.getGameInfo(gameId);
@@ -50,6 +51,8 @@ public class GameService {
             );
 
             reward = game.getReward();
+
+            logService.saveRewardHistory(gameId, reward);
         }
 
         GameOverResponseDTO result = new GameOverResponseDTO(
