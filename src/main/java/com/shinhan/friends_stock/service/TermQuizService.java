@@ -114,7 +114,7 @@ public class TermQuizService {
             List<Long> quizIdList = gameInfo.getQuizIdList();
             if (gameInfo.getCurrentStage() >= quizIdList.size()) {
                 // pass
-            } else {
+            } else if (gameInfo.isChecked()){
                 gameInfo.setCurrentQuizId(quizIdList.get(gameInfo.getCurrentStage()));
                 gameInfo.setCurrentStage(gameInfo.getCurrentStage() + 1);
                 gameInfo.setChecked(false);
