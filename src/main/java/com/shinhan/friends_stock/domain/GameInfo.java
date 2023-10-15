@@ -1,17 +1,22 @@
 package com.shinhan.friends_stock.domain;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.io.Serializable;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserInfo {
+public class GameInfo implements Serializable {
 
-    private long primaryKey;
-    private String nickname;
+    private long memberId;
+    private long gameId;
+    private int currentStage;
+    private boolean isChecked;
+    private int point;  // 호감도
 
     @Override
     public String toString() {
@@ -23,10 +28,10 @@ public class UserInfo {
         }
     }
 
-    public static UserInfo of(String json) {
+    public static GameInfo of(String json) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.readValue(json, UserInfo.class);
+            return mapper.readValue(json, GameInfo.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
