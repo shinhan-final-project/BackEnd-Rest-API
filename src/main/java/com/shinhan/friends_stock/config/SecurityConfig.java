@@ -30,8 +30,8 @@ public class SecurityConfig {
                 .authorizeRequests()
                 //각 ROLE에 따라 접근 구분
                 .antMatchers("/member/login").permitAll()
+                .antMatchers("/member/test").permitAll()
                 .antMatchers("/member/signin").permitAll()
-                .antMatchers("/member/test").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
