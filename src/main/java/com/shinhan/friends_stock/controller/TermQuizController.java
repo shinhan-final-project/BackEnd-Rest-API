@@ -1,5 +1,6 @@
 package com.shinhan.friends_stock.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.shinhan.friends_stock.DTO.term_quiz.UserAnswerRequsetDTO;
 import com.shinhan.friends_stock.DTO.term_quiz.QuestionResponseDTO;
 import com.shinhan.friends_stock.DTO.term_quiz.AnswerCheckResponseDTO;
@@ -16,9 +17,14 @@ public class TermQuizController {
 
     private final TermQuizService termQuizService;
 
-    @GetMapping("/questions/{quizId}")
-    public ApiResponse<QuestionResponseDTO> getQuiz(@PathVariable(value = "quizId") long quizId) throws Exception {
-        return termQuizService.getQuiz(quizId);
+    @PostMapping("/start")
+    public ApiResponse<String> startGame() throws JsonProcessingException {
+        return ApiResponse.success(termQuizService.generateGameInfo());
+    }
+
+    @GetMapping("/questions")
+    public ApiResponse<QuestionResponseDTO> getQuiz() throws Exception {
+        return termQuizService.getQuiz();
     }
 
     @PostMapping("/questions/{quizId}/answers/check")

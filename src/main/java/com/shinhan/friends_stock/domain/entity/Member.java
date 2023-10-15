@@ -17,6 +17,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name="member")
@@ -110,4 +111,12 @@ public class Member implements UserDetails {
         this.investCareerYear = investCareerYear;
         this.role = Role.USER;
     }
+
+    @OneToMany(
+            mappedBy = "member",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<RewardHistory> rewardHistoryList;
 }
