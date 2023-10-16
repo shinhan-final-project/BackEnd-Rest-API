@@ -57,6 +57,7 @@ public class MemberService {
     //중복된 이름 있으면 true
     public ApiResponse<Boolean> checkDuplicateName(String name) throws Exception {
         try {
+            //중복아니면 true return
             if(memberRepository.findByName(name).isEmpty())
                 return ApiResponse.success(true);
         }catch (Exception e){
@@ -67,8 +68,7 @@ public class MemberService {
     @Transactional
     public ApiResponse<String> signin(String nickName, String password, Gender gender, int age, int investCareerYear) throws Exception {
         try {
-            System.out.println(checkDuplicateName(nickName).getData());
-            if (!checkDuplicateName(nickName).getData()) {
+            if (checkDuplicateName(nickName).getData()) {
                 memberRepository.save(Member.builder()
                         .nickName(nickName)
                         .password(passwordEncoder.encode(password))
