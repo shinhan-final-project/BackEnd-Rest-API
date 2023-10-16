@@ -30,7 +30,7 @@ public class TermQuizItem {
 
     @Column(name = "writer_id")
     @NotNull
-    private long writerId;
+    private String writerId;
 
     @Column(name = "created_at")
     @NotNull
