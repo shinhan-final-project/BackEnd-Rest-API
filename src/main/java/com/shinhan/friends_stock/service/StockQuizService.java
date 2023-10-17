@@ -29,7 +29,7 @@ public class StockQuizService {
                 .orElseThrow(() -> new ResourceNotFoundException("문제가 없습니다."));
 
         StockQuizInfo gameInfo = new StockQuizInfo();
-        gameInfo.setGameId(2);
+        gameInfo.setGameId(GAME_ID);
         gameInfo.setStockId(stock.getItemId());
         gameInfo.setPoint(0);
         gameInfo.setCurrentStage(1);

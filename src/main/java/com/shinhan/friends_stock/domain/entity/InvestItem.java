@@ -27,7 +27,7 @@ public class InvestItem {
 
     //시가 총액
     @Column(name = "company_value")
-    private int companyValue;
+    private Integer companyValue;
 
     //주식 고유 코드
     @Column(name = "stock_code")
