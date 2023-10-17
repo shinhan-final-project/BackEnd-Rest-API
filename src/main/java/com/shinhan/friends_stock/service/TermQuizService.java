@@ -12,6 +12,7 @@ import com.shinhan.friends_stock.exception.ResourceNotFoundException;
 import com.shinhan.friends_stock.exception.ResourceNotPublishedException;
 import com.shinhan.friends_stock.repository.term_quiz.TermQuizItemRepository;
 import com.shinhan.friends_stock.repository.term_quiz.TermQuizQuestionRepository;
+import com.shinhan.friends_stock.utils.HtmlEscapeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,10 +104,12 @@ public class TermQuizService {
             }
 
             TermQuizQuestion quiz = getPublishedQuizById(quizId);
+            String description = quiz.getDescription();
+            description = HtmlEscapeUtil.unescapeHtml(description);
             SolutionResponseDTO result = new SolutionResponseDTO(
                     quiz.getId(),
                     quiz.getTerm(),
-                    quiz.getDescription(),
+                    description,
                     quiz.getExplanation()
             );
 
