@@ -1,9 +1,8 @@
 package com.shinhan.friends_stock.service;
 
-import com.shinhan.friends_stock.DTO.stock_quiz.CompanyResponseDTO;
-import com.shinhan.friends_stock.DTO.stock_quiz.StockNewsYearResponseDTO;
-import com.shinhan.friends_stock.DTO.stock_quiz.StockPredictionResponseDTO;
-import com.shinhan.friends_stock.DTO.stock_quiz.UserPredictionRequestDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.shinhan.friends_stock.DTO.stock_quiz.*;
 import com.shinhan.friends_stock.common.ApiResponse;
 import com.shinhan.friends_stock.domain.InvestmentBehavior;
 import com.shinhan.friends_stock.domain.StockQuizInfo;
@@ -16,12 +15,16 @@ import com.shinhan.friends_stock.repository.stock_quiz.InvestItemRepository;
 import com.shinhan.friends_stock.repository.stock_quiz.StockNewsYearRepository;
 import com.shinhan.friends_stock.repository.stock_quiz.StockReturnRateRepository;
 import com.shinhan.friends_stock.service.LogService;
+import com.shinhan.friends_stock.utils.S3Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +41,8 @@ public class StockQuizService {
 
     private final LogService logService;
 
+    private final S3Util s3Util;
+
     public ApiResponse<CompanyResponseDTO> getCompany() {
         // get from redis
         StockQuizInfo gameInfo = (StockQuizInfo) logService.getGameInfo(GAME_ID);
@@ -47,6 +52,51 @@ public class StockQuizService {
         InvestItem company = getPublishedCompany(companyId);
 
         return ApiResponse.success(CompanyResponseDTO.of(company));
+    }
+
+    public ApiResponse<StockPriceYearResponseDTO> getStocks(int year) throws JsonProcessingException {
+        // get from redis
+        StockQuizInfo gameInfo = (StockQuizInfo) logService.getGameInfo(GAME_ID);
+        long companyId = gameInfo.getCompanyId();
+        InvestItem company = getPublishedCompany(companyId);
+        if (year == 0) {
+            year = company.getQuizStartYear();
+        }
+
+        // get stocks
+        StringBuilder builder = new StringBuilder();
+        builder.append(company.getStockCode());
+        builder.append("-[");
+        builder.append(year);
+        builder.append("]");
+
+        String jsonString = s3Util.download(builder.toString());
+        try {
+            // Jackson ObjectMapper 생성
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            // JSON 문자열을 List<Map> 객체로 변환
+            List<Map<String, String>> dataList = objectMapper.readValue(jsonString, List.class);
+
+            List<Integer> price = new ArrayList<>();
+            List<String> date = new ArrayList<>();
+            for (Map<String, String> data : dataList) {
+                date.add(data.get("date"));
+                price.add(Integer.valueOf(data.get("price")));
+            }
+
+            StockPriceYearResponseDTO result = new StockPriceYearResponseDTO(
+                    year,
+                    price,
+                    date
+            );
+
+            // 변환된 데이터 출력
+            return ApiResponse.success(result);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     public ApiResponse<StockNewsYearResponseDTO> getNews(int year) {

@@ -1,9 +1,7 @@
 package com.shinhan.friends_stock.controller;
 
-import com.shinhan.friends_stock.DTO.stock_quiz.CompanyResponseDTO;
-import com.shinhan.friends_stock.DTO.stock_quiz.StockNewsYearResponseDTO;
-import com.shinhan.friends_stock.DTO.stock_quiz.StockPredictionResponseDTO;
-import com.shinhan.friends_stock.DTO.stock_quiz.UserPredictionRequestDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.shinhan.friends_stock.DTO.stock_quiz.*;
 import com.shinhan.friends_stock.common.ApiResponse;
 import com.shinhan.friends_stock.service.StockQuizService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +22,13 @@ public class StockQuizController {
     @GetMapping("/companies/question")
     public ApiResponse<CompanyResponseDTO> getCompany() {
         return stockQuizService.getCompany();
+    }
+
+    @GetMapping("/companies/stocks")
+    public ApiResponse<StockPriceYearResponseDTO> getStocks(
+            @RequestParam(name = "year", defaultValue = "0") int year
+    ) throws JsonProcessingException {
+        return stockQuizService.getStocks(year);
     }
 
     @GetMapping("/companies/news")
