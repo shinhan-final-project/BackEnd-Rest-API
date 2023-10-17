@@ -45,6 +45,7 @@ public class InvestGameLog {
     private Integer selectedPrice;
 
     @Column(name = "action", nullable = false)
+    @Enumerated(EnumType.STRING)
     private InvestmentBehavior action;
 
     @Column(name = "result", precision = 4, scale = 2)
