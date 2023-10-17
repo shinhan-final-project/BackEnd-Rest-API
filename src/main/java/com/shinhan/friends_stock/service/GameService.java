@@ -23,6 +23,8 @@ public class GameService {
 
     private final LogService logService;
 
+    private static final int[] GAME_STEP = new int[] { 0, 10, 5 };
+
     public ApiResponse<List<GameResponseDTO>> getGames() throws Exception {
         try {
             List<Game> games = gameRepository.findAll();
@@ -37,7 +39,7 @@ public class GameService {
         // get from redis
         GameInfo gameInfo = logService.getGameInfo(gameId);
         // TODO 게임 단계 확인
-        if (gameInfo.getCurrentStage() < 10) {
+        if (gameInfo.getCurrentStage() < GAME_STEP[(int) gameId]) {
             throw new ResourceNotPublishedException("아직 남은 퀴즈가 있어요.");
         }
 
