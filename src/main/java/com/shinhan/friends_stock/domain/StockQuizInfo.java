@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 public class StockQuizInfo extends GameInfo {
 
-    private long stockId;
+    private long companyId;
     private int[] results;
 
     public static StockQuizInfo of(String json) {

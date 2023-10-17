@@ -1,13 +1,12 @@
 package com.shinhan.friends_stock.service;
 
-import com.shinhan.friends_stock.domain.GameInfo;
-import com.shinhan.friends_stock.domain.TermQuizInfo;
-import com.shinhan.friends_stock.domain.UserInfo;
+import com.shinhan.friends_stock.domain.*;
 import com.shinhan.friends_stock.domain.entity.*;
 import com.shinhan.friends_stock.exception.ResourceNotFoundException;
 import com.shinhan.friends_stock.repository.GameRepository;
 import com.shinhan.friends_stock.repository.MemberRepository;
 import com.shinhan.friends_stock.repository.RewardHistoryRepository;
+import com.shinhan.friends_stock.repository.stock_quiz.InvestGameLogRepository;
 import com.shinhan.friends_stock.repository.term_quiz.TermQuizLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -16,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -23,6 +23,7 @@ import java.util.List;
 public class LogService {
 
     private final TermQuizLogRepository termQuizLogRepository;
+    private final InvestGameLogRepository investGameLogRepository;
     private final RewardHistoryRepository rewardHistoryRepository;
     private final MemberRepository memberRepository;
     private final GameRepository gameRepository;
@@ -71,6 +72,8 @@ public class LogService {
         GameInfo gameInfo;
         if (gameId == 1) {
             gameInfo = TermQuizInfo.of(json);
+        } else if (gameId == 2) {
+            gameInfo = StockQuizInfo.of(json);
         } else {
             gameInfo = GameInfo.of(json);
         }
@@ -131,6 +134,28 @@ public class LogService {
                 isCorrect
         );
         termQuizLogRepository.save(log);
+    }
+
+    public void saveInvestLog(long gameId, InvestItem item, int year, int price, InvestmentBehavior action, BigDecimal rate) {
+        long userId = getUserId();
+
+        Member member = memberRepository.findById(userId).orElseThrow(
+                () -> new ResourceNotFoundException("Member not found")
+        );
+        Game game = gameRepository.findById(gameId).orElseThrow(
+                () -> new ResourceNotFoundException("Game not found")
+        );
+
+        InvestGameLog log = new InvestGameLog(
+                member,
+                game,
+                item,
+                year,
+                price,
+                action,
+                rate
+        );
+        investGameLogRepository.save(log);
     }
 
     public void saveRewardHistory(long gameId, String reward) {
