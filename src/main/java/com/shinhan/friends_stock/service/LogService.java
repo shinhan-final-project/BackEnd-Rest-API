@@ -30,16 +30,19 @@ public class LogService {
     private final RedisTemplate<String, String> redisTemplate;
 
     /**
-     * 로그인한 사용자 PK
+     * 로그인한 사용자
      * @return
      */
-    private long getUserId() {
+    private UserInfo getUserInfo() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        UserInfo userInfo = UserInfo.of(userDetails.getUsername());
+        return UserInfo.of(userDetails.getUsername());
+    }
 
-        return userInfo.getPrimaryKey();
+    private long getUserId() {
+        UserInfo info = getUserInfo();
+        return info.getPrimaryKey();
     }
 
     /**
@@ -48,10 +51,12 @@ public class LogService {
      * @return Redis key
      */
     public String initGameInfo(GameInfo gameInfo) {
-        long userId = getUserId();
+        UserInfo info = getUserInfo();
+        long userId = info.getPrimaryKey();
         gameInfo.setMemberId(userId);
 
-        return saveGameInfo(gameInfo);
+        saveGameInfo(gameInfo);
+        return info.getNickname();
     }
 
     /**
