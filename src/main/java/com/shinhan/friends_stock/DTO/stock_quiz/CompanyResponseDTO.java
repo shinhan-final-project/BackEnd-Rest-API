@@ -14,11 +14,17 @@ public class CompanyResponseDTO {
 
     private final String companyInfo;
 
+    private final int startYear;
+
+    private final int endYear;
+
     public static CompanyResponseDTO of(InvestItem company) {
         return new CompanyResponseDTO(
                 company.getItemId(),
                 company.getCompanyName(),
-                company.getCompanyInfo()
+                company.getCompanyInfo(),
+                company.getQuizStartYear(),
+                company.getQuizStartYear() + 5
         );
     }
 }
