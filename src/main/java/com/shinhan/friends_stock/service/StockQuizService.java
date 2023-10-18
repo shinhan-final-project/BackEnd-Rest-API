@@ -129,6 +129,9 @@ public class StockQuizService {
         InvestmentBehavior answer = BigDecimal.ZERO.compareTo(returnRate.getRate()) > 0 ? InvestmentBehavior.BUY : InvestmentBehavior.SELL;
         boolean isCorrect = dto.getUserAnswer().equals(answer);
         int point = isCorrect ? PLUS_POINT : MINUS_POINT;
+        if (dto.getYear() == item.getQuizStartYear()) {
+            point = 0;
+        }
         StockPredictionResponseDTO result = new StockPredictionResponseDTO(
                 companyId,
                 dto.getYear(),
