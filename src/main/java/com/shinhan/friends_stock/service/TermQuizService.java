@@ -12,6 +12,7 @@ import com.shinhan.friends_stock.exception.ResourceNotFoundException;
 import com.shinhan.friends_stock.exception.ResourceNotPublishedException;
 import com.shinhan.friends_stock.repository.term_quiz.TermQuizItemRepository;
 import com.shinhan.friends_stock.repository.term_quiz.TermQuizQuestionRepository;
+import com.shinhan.friends_stock.utils.HtmlEscapeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,14 +100,16 @@ public class TermQuizService {
 
             // validate
             if (gameInfo.getCurrentQuizId() != quizId) {
-                throw new ResourceNotPublishedException("퀴즈 번호를 다시 확인하세요.");
+//                throw new ResourceNotPublishedException("퀴즈 번호를 다시 확인하세요.");
             }
 
             TermQuizQuestion quiz = getPublishedQuizById(quizId);
+            String description = quiz.getDescription();
+            description = HtmlEscapeUtil.unescapeHtml(description);
             SolutionResponseDTO result = new SolutionResponseDTO(
                     quiz.getId(),
                     quiz.getTerm(),
-                    quiz.getDescription(),
+                    description,
                     quiz.getExplanation()
             );
 
@@ -137,7 +140,9 @@ public class TermQuizService {
             return quiz;
         }
 
-        throw new ResourceNotPublishedException("게시되지 않은 문제입니다.");
+        return quiz;
+
+//        throw new ResourceNotPublishedException("게시되지 않은 문제입니다.");
     }
 
     public String generateGameInfo() {
