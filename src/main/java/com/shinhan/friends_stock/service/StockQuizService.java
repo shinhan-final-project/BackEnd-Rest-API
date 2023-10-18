@@ -138,8 +138,7 @@ public class StockQuizService {
                 point
         );
 
-        // TODO get 해당 연 마지막 날 종가
-        int stockPrice = 10000;
+        int stockPrice = returnRate.getLastPrice();
 
         // log
         logService.saveInvestLog(gameInfo.getGameId(), item, dto.getYear(), stockPrice, dto.getUserAnswer(), returnRate.getRate());

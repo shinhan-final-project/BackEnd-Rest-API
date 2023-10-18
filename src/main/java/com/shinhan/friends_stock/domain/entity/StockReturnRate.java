@@ -24,4 +24,7 @@ public class StockReturnRate {
 
     @Column(name = "rate", precision = 4, scale = 2)
     private BigDecimal rate;
+
+    @Column(name = "last_price")
+    private Integer lastPrice;
 }
