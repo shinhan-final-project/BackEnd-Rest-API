@@ -126,7 +126,7 @@ public class StockQuizService {
         StockReturnRate returnRate = stockReturnRateRepository.findByInvestItemAndYear(item, dto.getYear())
                 .orElseThrow(() -> new ResourceNotFoundException("수익률을 알 수 없습니다."));
 
-        InvestmentBehavior answer = BigDecimal.ZERO.compareTo(returnRate.getRate()) > 0 ? InvestmentBehavior.BUY : InvestmentBehavior.SELL;
+        InvestmentBehavior answer = returnRate.getRate().compareTo(BigDecimal.ZERO) > 0 ? InvestmentBehavior.BUY : InvestmentBehavior.SELL;
         boolean isCorrect = dto.getUserAnswer().equals(answer);
         int point = isCorrect ? PLUS_POINT : MINUS_POINT;
         if (dto.getYear() == item.getQuizStartYear()) {
