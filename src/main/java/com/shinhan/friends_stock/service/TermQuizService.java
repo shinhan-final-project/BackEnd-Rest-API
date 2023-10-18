@@ -100,7 +100,7 @@ public class TermQuizService {
 
             // validate
             if (gameInfo.getCurrentQuizId() != quizId) {
-//                throw new ResourceNotPublishedException("퀴즈 번호를 다시 확인하세요.");
+                throw new ResourceNotPublishedException("퀴즈 번호를 다시 확인하세요.");
             }
 
             TermQuizQuestion quiz = getPublishedQuizById(quizId);
@@ -140,9 +140,7 @@ public class TermQuizService {
             return quiz;
         }
 
-        return quiz;
-
-//        throw new ResourceNotPublishedException("게시되지 않은 문제입니다.");
+        throw new ResourceNotPublishedException("게시되지 않은 문제입니다.");
     }
 
     public String generateGameInfo() {
