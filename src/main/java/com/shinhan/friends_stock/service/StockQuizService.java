@@ -65,7 +65,7 @@ public class StockQuizService {
 
         // get stocks
         StringBuilder builder = new StringBuilder();
-        builder.append(company.getStockCode());
+        builder.append(String.format("%06d", company.getStockCode()));
         builder.append("-[");
         builder.append(year);
         builder.append("]");
