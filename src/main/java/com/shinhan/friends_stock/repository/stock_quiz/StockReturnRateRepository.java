@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface StockReturnRateRepository extends JpaRepository<StockReturnRate, Long> {
 
-    Optional<StockReturnRate> findByInvestItemAndYear(InvestItem item, int year);
+    Optional<StockReturnRate> findFirstByInvestItemAndYear(InvestItem item, int year);
 }

@@ -123,7 +123,7 @@ public class StockQuizService {
 
         // TODO validate
 
-        StockReturnRate returnRate = stockReturnRateRepository.findByInvestItemAndYear(item, dto.getYear())
+        StockReturnRate returnRate = stockReturnRateRepository.findFirstByInvestItemAndYear(item, dto.getYear())
                 .orElseThrow(() -> new ResourceNotFoundException("수익률을 알 수 없습니다."));
 
         InvestmentBehavior answer = returnRate.getRate().compareTo(BigDecimal.ZERO) > 0 ? InvestmentBehavior.BUY : InvestmentBehavior.SELL;
