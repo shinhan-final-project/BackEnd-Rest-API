@@ -38,12 +38,12 @@ public class GameService {
     public ApiResponse<GameOverResponseDTO> calcGameResult(long gameId) {
         // get from redis
         GameInfo gameInfo = logService.getGameInfo(gameId);
-        // TODO 게임 단계 확인
+        // 게임 단계 확인
         if (gameInfo.getCurrentStage() < GAME_STEP[(int) gameId]) {
             throw new ResourceNotPublishedException("아직 남은 퀴즈가 있어요.");
         }
 
-        // TODO 성공 조건 확인
+        // 성공 조건 확인
         boolean isWin = gameInfo.getPoint() >= 100;
         String reward = null;
 
